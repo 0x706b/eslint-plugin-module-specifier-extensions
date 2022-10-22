@@ -12,9 +12,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc && node package.js",
-    "link:local": "yarn link \"@0x706b/eslint-plugin-module-specifier-extensions\"",
-    "unlink:local": "yarn unlink \"@0x706b/eslint-plugin-module-specifier-extensions\"",
-    "publish:package": "cd dist && yarn publish && cd ../"
+    "publish:package": "cd ./dist && npm publish && cd ../"
   },
   "peerDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.9.1",
