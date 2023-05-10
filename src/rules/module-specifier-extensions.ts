@@ -89,9 +89,9 @@ export default createRule({
         .map((v) => (typeof v === "string" ? new RegExp(v) : v instanceof RegExp ? v : undefined))
         .filter((regExp): regExp is RegExp => !!regExp)
     } else if (typeof force === "string") {
-      remove = [new RegExp(force)]
+      force = [new RegExp(force)]
     } else {
-      remove = []
+      force = []
     }
     const options = {
       ignore,
@@ -214,7 +214,7 @@ function createValidESMPath(specifier: string, resolvedPath: string, sourceFileP
       resolvedPath = path.resolve(path.parse(sourceFilePath).dir, specifier === ".." ? "../" : specifier)
     }
     for (const extension in options.extensions) {
-      if (isFile(resolvedPath + extension)) {
+      if (isFile(resolvedPath + extension) || options.force.some((regex) => regex.test(specifier))) {
         return specifier + options.extensions[extension]
       }
     }
