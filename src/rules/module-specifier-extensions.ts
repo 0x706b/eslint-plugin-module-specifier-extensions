@@ -15,6 +15,7 @@ interface Options {
   ignore: Array<RegExp>
   extensions: Record<string, string>
   remove: Array<RegExp>
+  force: Array<RegExp>
 }
 
 export default createRule({
@@ -43,6 +44,9 @@ export default createRule({
           extensions: {
             type: "object",
           },
+          force: {
+            type: "any",
+          },
         },
       },
     ],
@@ -55,11 +59,12 @@ export default createRule({
         ".ts": ".js",
       },
       remove: [],
+      force: [],
     } as Options,
   ],
   create(context, optionsWithDefaults) {
     let _a, _b
-    let { ignore, remove } = optionsWithDefaults[0]
+    let { ignore, remove, force } = optionsWithDefaults[0]
     const { extensions } = optionsWithDefaults[0]
     if (Array.isArray(ignore)) {
       ignore = ignore
@@ -79,10 +84,20 @@ export default createRule({
     } else {
       remove = []
     }
+    if (Array.isArray(force)) {
+      force = force
+        .map((v) => (typeof v === "string" ? new RegExp(v) : v instanceof RegExp ? v : undefined))
+        .filter((regExp): regExp is RegExp => !!regExp)
+    } else if (typeof force === "string") {
+      remove = [new RegExp(force)]
+    } else {
+      remove = []
+    }
     const options = {
       ignore,
       extensions,
       remove,
+      force,
     }
     const sourcePath = context.getPhysicalFilename?.() ?? context.getFilename()
     const moduleSpecifiers: Array<TSESTree.StringLiteral> = []
@@ -136,7 +151,7 @@ export default createRule({
     function check(node: TSESTree.StringLiteral, sourceFilePath: string) {
       const specifier = node.value
       if (isPathExtensionEmpty(specifier)) {
-        if (isPathRelative(specifier)) {
+        if (isPathRelative(specifier) || options.force.some((regex) => regex.test(specifier))) {
           const newSpeciferPath = createValidESMPath(specifier, "", sourceFilePath, options)
           if (newSpeciferPath !== specifier) {
             context.report({
