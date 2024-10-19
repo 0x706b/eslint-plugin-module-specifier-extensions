@@ -1,9 +1,9 @@
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils"
+import { ESLintUtils, TSESTree } from "@typescript-eslint/experimental-utils"
 import fs from "fs"
 import module from "module"
 import path from "path"
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const version = require("../package.json").version
 
 const createRule = ESLintUtils.RuleCreator(
@@ -63,7 +63,6 @@ export default createRule({
     } as Options,
   ],
   create(context, optionsWithDefaults) {
-    let _a, _b
     let { ignore, remove, force } = optionsWithDefaults[0]
     const { extensions } = optionsWithDefaults[0]
     if (Array.isArray(ignore)) {
@@ -72,6 +71,8 @@ export default createRule({
         .filter((regExp): regExp is RegExp => !!regExp)
     } else if (typeof ignore === "string") {
       ignore = [new RegExp(ignore)]
+    } else if ((ignore as unknown) instanceof RegExp) {
+      ignore = [ignore]
     } else {
       ignore = []
     }
@@ -81,6 +82,8 @@ export default createRule({
         .filter((regExp): regExp is RegExp => !!regExp)
     } else if (typeof remove === "string") {
       remove = [new RegExp(remove)]
+    } else if ((remove as unknown) instanceof RegExp) {
+      remove = [remove]
     } else {
       remove = []
     }
@@ -90,6 +93,8 @@ export default createRule({
         .filter((regExp): regExp is RegExp => !!regExp)
     } else if (typeof force === "string") {
       force = [new RegExp(force)]
+    } else if ((force as unknown) instanceof RegExp) {
+      force = [force]
     } else {
       force = []
     }

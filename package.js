@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs/promises")
 const path = require("path")
 const { exec } = require("child_process")
